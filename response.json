@@ -1,0 +1,235 @@
+{
+    "daily_summary": [
+        {
+            "lat": 32.9552598,
+            "lon": -97.0155703,
+            "tz": "-05:00",
+            "date": "2025-10-01",
+            "units": "imperial",
+            "cloud_cover": {
+                "afternoon": 0.0
+            },
+            "humidity": {
+                "afternoon": 51.0
+            },
+            "precipitation": {
+                "total": 0.0
+            },
+            "temperature": {
+                "min": 67.59,
+                "max": 90.16,
+                "afternoon": 85.96,
+                "night": 74.41,
+                "evening": 88.23,
+                "morning": 68.92
+            },
+            "pressure": {
+                "afternoon": 1018.0
+            },
+            "wind": {
+                "max": {
+                    "speed": 9.22,
+                    "direction": 100.0
+                }
+            }
+        },
+        {
+            "lat": 32.9552598,
+            "lon": -97.0155703,
+            "tz": "-05:00",
+            "date": "2025-09-30",
+            "units": "imperial",
+            "cloud_cover": {
+                "afternoon": 0.0
+            },
+            "humidity": {
+                "afternoon": 47.0
+            },
+            "precipitation": {
+                "total": 0.0
+            },
+            "temperature": {
+                "min": 70.02,
+                "max": 88.57,
+                "afternoon": 86.36,
+                "night": 75.31,
+                "evening": 87.24,
+                "morning": 70.81
+            },
+            "pressure": {
+                "afternoon": 1019.0
+            },
+            "wind": {
+                "max": {
+                    "speed": 10.36,
+                    "direction": 10.0
+                }
+            }
+        },
+        {
+            "lat": 32.9552598,
+            "lon": -97.0155703,
+            "tz": "-05:00",
+            "date": "2025-09-29",
+            "units": "imperial",
+            "cloud_cover": {
+                "afternoon": 40.0
+            },
+            "humidity": {
+                "afternoon": 50.0
+            },
+            "precipitation": {
+                "total": 0.0
+            },
+            "temperature": {
+                "min": 66.36,
+                "max": 86.43,
+                "afternoon": 83.08,
+                "night": 73.47,
+                "evening": 84.96,
+                "morning": 67.5
+            },
+            "pressure": {
+                "afternoon": 1020.0
+            },
+            "wind": {
+                "max": {
+                    "speed": 11.5,
+                    "direction": 70.0
+                }
+            }
+        },
+        {
+            "lat": 32.9552598,
+            "lon": -97.0155703,
+            "tz": "-05:00",
+            "date": "2025-09-28",
+            "units": "imperial",
+            "cloud_cover": {
+                "afternoon": 75.0
+            },
+            "humidity": {
+                "afternoon": 48.0
+            },
+            "precipitation": {
+                "total": 0.0
+            },
+            "temperature": {
+                "min": 66.83,
+                "max": 86.5,
+                "afternoon": 84.49,
+                "night": 73.36,
+                "evening": 84.78,
+                "morning": 67.53
+            },
+            "pressure": {
+                "afternoon": 1019.0
+            },
+            "wind": {
+                "max": {
+                    "speed": 9.22,
+                    "direction": 50.0
+                }
+            }
+        },
+        {
+            "lat": 32.9552598,
+            "lon": -97.0155703,
+            "tz": "-05:00",
+            "date": "2025-09-27",
+            "units": "imperial",
+            "cloud_cover": {
+                "afternoon": 20.0
+            },
+            "humidity": {
+                "afternoon": 48.0
+            },
+            "precipitation": {
+                "total": 0.0
+            },
+            "temperature": {
+                "min": 66.63,
+                "max": 89.37,
+                "afternoon": 84.74,
+                "night": 73.53,
+                "evening": 87.89,
+                "morning": 67.6
+            },
+            "pressure": {
+                "afternoon": 1016.0
+            },
+            "wind": {
+                "max": {
+                    "speed": 8.05,
+                    "direction": 170.0
+                }
+            }
+        },
+        {
+            "lat": 32.9552598,
+            "lon": -97.0155703,
+            "tz": "-05:00",
+            "date": "2025-09-26",
+            "units": "imperial",
+            "cloud_cover": {
+                "afternoon": 20.0
+            },
+            "humidity": {
+                "afternoon": 48.0
+            },
+            "precipitation": {
+                "total": 0.0
+            },
+            "temperature": {
+                "min": 66.38,
+                "max": 88.95,
+                "afternoon": 84.33,
+                "night": 71.85,
+                "evening": 87.04,
+                "morning": 66.69
+            },
+            "pressure": {
+                "afternoon": 1015.0
+            },
+            "wind": {
+                "max": {
+                    "speed": 8.05,
+                    "direction": 20.0
+                }
+            }
+        },
+        {
+            "lat": 32.9552598,
+            "lon": -97.0155703,
+            "tz": "-05:00",
+            "date": "2025-09-25",
+            "units": "imperial",
+            "cloud_cover": {
+                "afternoon": 40.0
+            },
+            "humidity": {
+                "afternoon": 61.0
+            },
+            "precipitation": {
+                "total": 0.0
+            },
+            "temperature": {
+                "min": 66.58,
+                "max": 85.64,
+                "afternoon": 80.98,
+                "night": 72.86,
+                "evening": 83.79,
+                "morning": 67.23
+            },
+            "pressure": {
+                "afternoon": 1018.0
+            },
+            "wind": {
+                "max": {
+                    "speed": 13.8,
+                    "direction": 350.0
+                }
+            }
+        }
+    ]
+}

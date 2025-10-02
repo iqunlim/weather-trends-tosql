@@ -5,7 +5,7 @@ type VALID_JSON_TYPES = str | int | float | bool | None | dict[
 ] | list[VALID_JSON_TYPES]
 
 
-def read_json(file: str) -> dict[str, VALID_JSON_TYPES]:
+def read_json(file: str) -> VALID_JSON_TYPES:
 
     print(f"Reading json file {file}")
 
@@ -15,6 +15,6 @@ def read_json(file: str) -> dict[str, VALID_JSON_TYPES]:
     return ret
 
 
-def to_json(to_filepath: str, data: str | dict[str, VALID_JSON_TYPES]):
+def to_json(to_filepath: str, data: VALID_JSON_TYPES):
     with open(to_filepath, "w") as file:
         json.dump(data, file, indent=4)
