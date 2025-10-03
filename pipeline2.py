@@ -112,8 +112,7 @@ def transform(df: DataFrame, sample_size=10) -> DataFrame:
     df = df.drop(["movies", "screenshots", "bad_row", "user_score"], axis=1)
 
     # filter adult games
-    # the ~ is a bitwise reverse operator, flipping it from 1 to 0
-    df = df[~(df["tags"].str.contains("Nudity") == True)]
+    df = df[(df["tags"].str.contains("Nudity") == False)]
 
     # drop games with no bad reviews and no good reviews
     df = df[((df["positive"] != 0) | (df["negative"] != 0))]
@@ -123,7 +122,7 @@ def transform(df: DataFrame, sample_size=10) -> DataFrame:
 
 
 def load(clean_df: DataFrame, db_file: str, table_name: str) -> None:
-    print("LOading file to database....")
+    print("Loading file to database....")
     """Connects to the database and loads the data."""
     # Loads the clean_df to SQLite using df.to_sql().
     with sqlite3.connect(db_file) as conn:
@@ -136,7 +135,8 @@ def main(n: int):
     clean_df = transform(data, n)
     print("Preview:\n")
     print(clean_df.head())
-    # load(clean_df, env_vars["db_path"], "games_sample")
+
+    load(clean_df, os.environ.get("DATABASE_PATH"), "games_sample")  # type: ignore
 
 
 if __name__ == "__main__":
