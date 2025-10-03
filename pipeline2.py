@@ -111,7 +111,7 @@ def transform(df: DataFrame, sample_size=10) -> DataFrame:
         axis=1,
     )
 
-    # filter adult games
+    # filter NSFW games
     df = df[(df["tags"].str.contains("Nudity") == False)]
 
     # drop games with no bad reviews and no good reviews
@@ -137,7 +137,6 @@ def main(n: int):
     clean_df = transform(data, n)
     print("Preview:\n")
     print(clean_df.head())
-
     load(clean_df, os.environ.get("DATABASE_PATH"), "games_sample")  # type: ignore
 
 

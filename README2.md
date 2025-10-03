@@ -4,7 +4,7 @@
 [Steam Games Dataset: Kaggle](https://www.kaggle.com/datasets/fronkongames/steam-games-dataset)
 
 ## Business Question:
-"Of a random selection of some number of steam games specified by the user, what are the the average ratings of games based on positive and negative reviews"
+"Of a random selection of some number of steam games specified by the user, what sort of correlation is there between metacritic reviews and positive/negative ratios of user reviews"
 
 ## Cleaning Steps:
 1. There was an extra comma causing the rows to disjoint, so we must rename all of the columns to account for this
