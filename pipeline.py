@@ -1,20 +1,16 @@
 import argparse
-import json
-from pathlib import Path
 import sqlite3
 from dotenv import load_dotenv
 import os
 from pandas import DataFrame
 import pandas as pd
 import requests
+from tqdm import tqdm
 
-import kagglehub
 from utils.json import VALID_JSON_TYPES, read_json
-from utils.csv import save_csv
 from utils.columns import (
     camel_to_sql_valid_snake,
     transform_wind_angle_to_direction,
-    change_col_to_date_type,
 )
 
 # from utils import to_json
@@ -64,7 +60,9 @@ def extract(source: str, key: str, num_days) -> VALID_JSON_TYPES:
     # Put API requests and initial JSON loading here.
     data = {}
     data["daily_summary"] = []
-    for i in range(1, num_days + 1):
+
+    print("Loading Data from API...")
+    for i in tqdm(range(1, num_days + 1)):
         current = datetime.today() - timedelta(days=i)
 
         querystring = {
@@ -84,6 +82,7 @@ def extract(source: str, key: str, num_days) -> VALID_JSON_TYPES:
 
 
 def transform(raw_data, min_temp=90) -> DataFrame:
+    print("Transforming data. See Readme for details...")
     """Performs all necessary cleaning and processing on the data."""
     # Returns the clean DataFramedef extract(source: str, key: str, num_days=7) -> VALID_JSON_TYPES:
     """Fetches data from the API and returns the raw data (JSON/list)."""
@@ -117,6 +116,7 @@ def transform(raw_data, min_temp=90) -> DataFrame:
 def load(clean_df: DataFrame, db_file: str, table_name: str) -> None:
     """Connects to the database and loads the data."""
     # Loads the clean_df to SQLite using df.to_sql().
+    print("Loading Data to Database...")
     with sqlite3.connect(db_file) as conn:
         clean_df.to_sql(name=table_name, con=conn, if_exists="replace", index=False)
 
@@ -126,12 +126,13 @@ def main():
     args = parser.parse_args()
     """Coordinates the ETL pipeline by calling extract -> transform -> load."""
     env_vars = load_env_vars()
-    data = extract(env_vars["api_url"], env_vars["api_key"], num_days=args.days)
+    # data = extract(env_vars["api_url"], env_vars["api_key"], num_days=args.days)
+    data = read_json("response.json")
     df = transform(data, min_temp=args.temp)
     load(df, env_vars["db_path"], "weather_sevendays")
 
 
 if __name__ == "__main__":
-
+    print("Weather Data Loading Script")
     load_dotenv()
     main()

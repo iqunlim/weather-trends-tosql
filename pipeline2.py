@@ -83,16 +83,16 @@ def cronstruct_argparse():
 
 
 def extract() -> DataFrame:
-
+    print("Fetching File from remote. This may take a moment...")
     # Download latest version
     path = kagglehub.dataset_download("fronkongames/steam-games-dataset")
+    print("Reading csv file in to dataframe for transformations....")
     df = pd.read_csv(path + "/games.csv", index_col=None, header=0, names=COLS)
-    print(df.columns)
     return df
 
 
 def transform(df: DataFrame, sample_size=10) -> DataFrame:
-
+    print("Running Transforms. See Readme for details.")
     # take a random amount of sample size n
     df = df.sample(n=sample_size)
     # sort values by app id, since they are now all over the place after the random sample
@@ -104,23 +104,26 @@ def transform(df: DataFrame, sample_size=10) -> DataFrame:
     df.columns = [camel_to_sql_valid_snake(col) for col in df.columns]
 
     # combine the two that were causing csv issues:
-    df["achievements"] = df["achievements"] + "," + df["bad_row"]
+    df["achievements"] = (
+        df["achievements"].astype(str) + "," + df["bad_row"].astype(str)
+    )
 
     # Clear out unnecessary rows that we do not need
     df = df.drop(["movies", "screenshots", "bad_row", "user_score"], axis=1)
 
     # filter adult games
     # the ~ is a bitwise reverse operator, flipping it from 1 to 0
-    df = df[~(df["tags"].str.contains("Nudity"))]
+    df = df[~(df["tags"].str.contains("Nudity") == True)]
 
     # drop games with no bad reviews and no good reviews
-    df = df[(df["positive"] != 0) | (df["negative"] != 0)]
+    df = df[((df["positive"] != 0) | (df["negative"] != 0))]
 
     # ...etc
     return df
 
 
 def load(clean_df: DataFrame, db_file: str, table_name: str) -> None:
+    print("LOading file to database....")
     """Connects to the database and loads the data."""
     # Loads the clean_df to SQLite using df.to_sql().
     with sqlite3.connect(db_file) as conn:
@@ -129,9 +132,9 @@ def load(clean_df: DataFrame, db_file: str, table_name: str) -> None:
 
 def main(n: int):
     """Coordinates the ETL pipeline by calling extract -> transform -> load."""
-    env_vars = load_env_vars()
     data = extract()
     clean_df = transform(data, n)
+    print("Preview:\n")
     print(clean_df.head())
     # load(clean_df, env_vars["db_path"], "games_sample")
 
