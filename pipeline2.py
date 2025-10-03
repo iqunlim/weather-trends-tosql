@@ -52,22 +52,6 @@ COLS = [
 ]
 
 
-def load_env_vars() -> dict[str, str]:
-
-    env_vars = {
-        "api_url": os.getenv("API_URL"),
-        "db_path": os.getenv("DATABASE_PATH"),
-        "api_key": os.getenv("API_KEY"),
-    }
-
-    for key, val in env_vars.items():
-        if val == None or val == "":
-            msg = f"Error: Missing environment variable {key}"
-            raise EnvironmentError(msg)
-
-    return env_vars  # type: ignore
-
-
 def cronstruct_argparse():
     parser = argparse.ArgumentParser(description="Steam Random Game Sampler")
 
@@ -109,7 +93,23 @@ def transform(df: DataFrame, sample_size=10) -> DataFrame:
     )
 
     # Clear out unnecessary rows that we do not need
-    df = df.drop(["movies", "screenshots", "bad_row", "user_score"], axis=1)
+    df = df.drop(
+        [
+            "movies",
+            "screenshots",
+            "bad_row",
+            "user_score",
+            "supported_languages",
+            "full_audio_languages",
+            "header_image",
+            "website",
+            "support_url",
+            "support_email",
+            "score_rank",
+            "notes",
+        ],
+        axis=1,
+    )
 
     # filter adult games
     df = df[(df["tags"].str.contains("Nudity") == False)]
@@ -117,7 +117,6 @@ def transform(df: DataFrame, sample_size=10) -> DataFrame:
     # drop games with no bad reviews and no good reviews
     df = df[((df["positive"] != 0) | (df["negative"] != 0))]
 
-    # ...etc
     return df
 
 
