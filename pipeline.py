@@ -1,9 +1,21 @@
+import argparse
+import json
+from pathlib import Path
+import sqlite3
 from dotenv import load_dotenv
 import os
 from pandas import DataFrame
+import pandas as pd
 import requests
 
-from utils.json import VALID_JSON_TYPES, to_json, read_json
+import kagglehub
+from utils.json import VALID_JSON_TYPES, read_json
+from utils.csv import save_csv
+from utils.columns import (
+    camel_to_sql_valid_snake,
+    transform_wind_angle_to_direction,
+    change_col_to_date_type,
+)
 
 # from utils import to_json
 from datetime import datetime, timedelta
@@ -25,7 +37,29 @@ def load_env_vars() -> dict[str, str]:
     return env_vars  # type: ignore
 
 
-def extract(source: str, key: str, num_days=7) -> VALID_JSON_TYPES:
+def cronstruct_argparse():
+    parser = argparse.ArgumentParser(description="Steam Random Game Sampler")
+
+    parser.add_argument(
+        "-t",
+        "--temp",
+        type=int,
+        default=90,
+        help="Pull data with a high of {temperature}. Defaults to 90.",
+    )
+
+    parser.add_argument(
+        "-d",
+        "--days",
+        type=int,
+        default=30,
+        help="Pull # of previous days. Defaults to 30 days.",
+    )
+
+    return parser
+
+
+def extract(source: str, key: str, num_days) -> VALID_JSON_TYPES:
     """Fetches data from the API and returns the raw data (JSON/list)."""
     # Put API requests and initial JSON loading here.
     data = {}
@@ -49,30 +83,55 @@ def extract(source: str, key: str, num_days=7) -> VALID_JSON_TYPES:
     return data
 
 
-def transform(raw_data: VALID_JSON_TYPES) -> DataFrame:
+def transform(raw_data, min_temp=90) -> DataFrame:
     """Performs all necessary cleaning and processing on the data."""
-    # Returns the clean DataFrame.
-    print(raw_data)
-    pass
+    # Returns the clean DataFramedef extract(source: str, key: str, num_days=7) -> VALID_JSON_TYPES:
+    """Fetches data from the API and returns the raw data (JSON/list)."""
+    # Put API requests and initial JSON loading here.
+    data = {}
+    data["daily_summary"] = []
+
+    df = pd.json_normalize(raw_data, record_path="daily_summary", sep="_")
+    # normalize col names
+    df.columns = [camel_to_sql_valid_snake(col) for col in df.columns]
+    # Clear out unneeded fields
+    df = df.drop(["units", "lat", "lon", "tz"], axis=1)
+    mapper = {"wind_max_direction": "wind_direction", "wind_max_speed": "wind_speed"}
+
+    df = df.rename(columns=mapper)
+
+    # sort by date ascending
+    df = df.sort_values(by="date", ascending=True)
+
+    # bind it to the minimum temperature, we only want whats above
+    df = df[df["temperature_max"] > min_temp]
+
+    # convert wind by degrees to an actual direction
+    df["wind_direction"] = df["wind_direction"].apply(
+        lambda x: transform_wind_angle_to_direction(x)
+    )
+
+    return df
 
 
 def load(clean_df: DataFrame, db_file: str, table_name: str) -> None:
     """Connects to the database and loads the data."""
     # Loads the clean_df to SQLite using df.to_sql().
-    print("Load")
-    pass
+    with sqlite3.connect(db_file) as conn:
+        clean_df.to_sql(name=table_name, con=conn, if_exists="replace", index=False)
 
 
 def main():
+    parser = cronstruct_argparse()
+    args = parser.parse_args()
     """Coordinates the ETL pipeline by calling extract -> transform -> load."""
     env_vars = load_env_vars()
-
-    # data = extract(env_vars["api_url"], env_vars["api_key"])
-    data = read_json("response.json")
-    df = transform(data)
+    data = extract(env_vars["api_url"], env_vars["api_key"], num_days=args.days)
+    df = transform(data, min_temp=args.temp)
     load(df, env_vars["db_path"], "weather_sevendays")
 
 
 if __name__ == "__main__":
+
     load_dotenv()
     main()
