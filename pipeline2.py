@@ -117,6 +117,9 @@ def transform(df: DataFrame, sample_size=10) -> DataFrame:
     # drop games with no bad reviews and no good reviews
     df = df[((df["positive"] != 0) | (df["negative"] != 0))]
 
+    # drop games with no metacritic score
+    df = df[(df["metacritic_score"] != 0)]
+
     return df
 
 
