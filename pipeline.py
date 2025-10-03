@@ -77,7 +77,6 @@ def extract(source: str, key: str, num_days) -> VALID_JSON_TYPES:
         response.raise_for_status()
         data["daily_summary"].append(response.json())
 
-    data["count_days"] = num_days
     return data
 
 
@@ -126,8 +125,7 @@ def main():
     args = parser.parse_args()
     """Coordinates the ETL pipeline by calling extract -> transform -> load."""
     env_vars = load_env_vars()
-    # data = extract(env_vars["api_url"], env_vars["api_key"], num_days=args.days)
-    data = read_json("response.json")
+    data = extract(env_vars["api_url"], env_vars["api_key"], num_days=args.days)
     df = transform(data, min_temp=args.temp)
     load(df, env_vars["db_path"], "weather_sevendays")
 
