@@ -3,9 +3,14 @@ import sqlite3
 import pandas as pd
 import kagglehub
 from pandas import DataFrame
+import sys
 
 from utils.columns import camel_to_sql_valid_snake
 import argparse
+
+from datetime import datetime
+
+from utils.logger import log_if_empty, log_row_diffs
 
 COLS = [
     "AppID",
@@ -96,16 +101,22 @@ def cronstruct_argparse():
 
 
 def extract(source: str) -> DataFrame:
-    logging.debug("Fetching File from remote. This may take a moment...")
     # Download latest version
-    path = kagglehub.dataset_download(source)
-    logging.debug("Reading csv file in to dataframe for transformations....")
-    df = pd.read_csv(path + "/games.csv", index_col=None, header=0, names=COLS)
-    return df
+    logging.info("Starting Extract...")
+    df = pd.DataFrame()
+    try:
+        logging.debug("Fetching File from remote. This may take a moment...")
+        path = kagglehub.dataset_download(source)
+        logging.info("Reading csv file in to dataframe for transformations....")
+        df = pd.read_csv(path + "/games.csv", index_col=None, header=0, names=COLS)
+    except Exception as e:
+        logging.critical(e)
+    finally:
+        return df
 
 
 def transform(df: DataFrame, sample_size=10) -> DataFrame:
-    logging.debug("Running Transforms.")
+    logging.info("Running Transforms.")
     # take a random amount of sample size n
     logging.debug("Taking sample of size %d", sample_size)
     df = df.sample(n=sample_size)
@@ -148,29 +159,34 @@ def transform(df: DataFrame, sample_size=10) -> DataFrame:
     logging.debug("Dropping NSFW games")
     # filter NSFW games
     df_nonsfw = df[(df["tags"].str.contains("Nudity") == False)]
+    log_row_diffs(df, df_nonsfw, "Drop NSFW Games")
 
     logging.debug("Filtering games with no reviews")
     # drop games with no bad reviews and no good reviews
     df_noreview = df_nonsfw[
         ((df_nonsfw["positive"] != 0) | (df_nonsfw["negative"] != 0))
     ]
+    log_row_diffs(df_nonsfw, df_noreview, "Drop Un-User-Reviewed Games")
 
     # drop games with no metacritic score
     df_cleaned = df_noreview[(df_noreview["metacritic_score"] != 0)]
+    log_row_diffs(df_noreview, df_cleaned, "Drop No Metacritic Review Games")
 
-    if df.empty:
-        logging.debug("DataFrame was Empty. Please run with a higher '-n' value.")
+    log_if_empty(df_cleaned)
 
-    logging.debug("Complete.")
+    logging.debug("Complete. Final Row Count: %d", df_cleaned.shape[0])
     return df_cleaned
 
 
 def load(clean_df: DataFrame, db_file: str, table_name: str) -> None:
-    logging.debug("Loading file to database %s on table %s", db_file, table_name)
+    logging.info("Loading file to database %s on table %s", db_file, table_name)
     """Connects to the database and loads the data."""
     # Loads the clean_df to SQLite using df.to_sql().
-    with sqlite3.connect(db_file) as conn:
-        clean_df.to_sql(name=table_name, con=conn, if_exists="replace", index=True)
+    try:
+        with sqlite3.connect(db_file) as conn:
+            clean_df.to_sql(name=table_name, con=conn, if_exists="replace", index=True)
+    except sqlite3.Error:
+        logging.critical("Failed to load database file.")
 
 
 def main():
@@ -185,6 +201,8 @@ def main():
     logging.basicConfig(
         level=logging.DEBUG if args.verbose else logging.INFO,
         format="%(asctime)s - %(levelname)s - %(message)s",
+        filename="./pipeline_run.log",
+        filemode="a",
     )
 
     logging.debug("Configuration: ")
@@ -196,15 +214,10 @@ def main():
     # ETL
     data = extract(source=args.source)
     clean_df = transform(data, args.count)
-    # This doesnt cleanly print to logging. so I have to use .print()
-    if args.verbose and not clean_df.empty:
-        logging.debug("Preview:\n")
-        print(clean_df.head())
-
     load(clean_df, args.db_path, args.table)  # type: ignore
-    print("Pipeline Finished.")
+    logging.info("Pipeline Finished.")
 
 
 if __name__ == "__main__":
-
+    logging.info(f"Steam Game Analyzer - {datetime.now()}")
     main()

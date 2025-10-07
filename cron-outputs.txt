@@ -1,0 +1,5 @@
+crontab -l output:
+
+20 * * * * /mnt/sda2/Projects/wos/python-data/mini-project/.venv/bin/python3 /mnt/sda2/Projects/wos/python-data/mini-project/refactored_etl.py --source fronkongames/steam-games-dataset --table output-$(date '+%Y-%m-%d_%H-%M-%S') --db-path output.db -n 100000
+
+crontab logs: See pipeline_run.log

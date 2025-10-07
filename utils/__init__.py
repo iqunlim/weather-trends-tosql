@@ -5,6 +5,7 @@ from .fields import normalize_field
 from .columns import change_col_to_date_type, camel_to_sql_valid_snake
 from .csv import load_csv, save_csv
 from .json import read_json, to_json, VALID_JSON_TYPES
+from .logger import log_row_diffs, log_if_empty
 
 __all__ = [
     "normalize_field",
@@ -15,4 +16,6 @@ __all__ = [
     "read_json",
     "to_json",
     "VALID_JSON_TYPES",
+    "log_row_diffs",
+    "log_if_empty",
 ]
